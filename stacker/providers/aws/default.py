@@ -4,6 +4,7 @@ import logging
 import time
 import urlparse
 import sys
+import threading
 from ddtrace import tracer
 
 import botocore.exceptions
@@ -448,13 +449,19 @@ class ProviderBuilder(object):
     def __init__(self, region=None, **kwargs):
         self.region = region
         self.kwargs = kwargs
+        self.providers = {}
+        self.lock = threading.RLock()
 
     @tracer.wrap("aws.ProviderBuilder.build")
     def build(self, region=None, profile=None):
         if not region:
             region = self.region
         session = get_session(region=region, profile=profile)
-        return Provider(session, region=region, **self.kwargs)
+        with self.lock:
+            key = hash("%s%s" % (region, profile))
+            if key not in self.providers:
+                self.providers[key] = Provider(session, region=region, **self.kwargs)
+            return self.providers[key]
 
 
 class Provider(BaseProvider):
