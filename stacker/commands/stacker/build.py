@@ -6,6 +6,7 @@ skip executing anything against the stack.
 
 """
 
+from ddtrace import tracer
 from .base import BaseCommand, cancel
 from ...actions import build
 
@@ -45,14 +46,16 @@ class Build(BaseCommand):
                                  "to a directory")
 
     def run(self, options, **kwargs):
-        super(Build, self).run(options, **kwargs)
-        action = build.Action(options.context,
-                              provider_builder=options.provider_builder,
-                              cancel=cancel())
-        action.execute(concurrency=options.max_parallel,
-                       outline=options.outline,
-                       tail=options.tail,
-                       dump=options.dump)
+        with tracer.trace("command", resource="build") as span:
+            span.service = "stacker"
+            super(Build, self).run(options, **kwargs)
+            action = build.Action(options.context,
+                                  provider_builder=options.provider_builder,
+                                  cancel=cancel())
+            action.execute(concurrency=options.max_parallel,
+                           outline=options.outline,
+                           tail=options.tail,
+                           dump=options.dump)
 
     def get_context_kwargs(self, options, **kwargs):
         return {"stack_names": options.stacks, "force_stacks": options.force}
