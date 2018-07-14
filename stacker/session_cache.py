@@ -1,6 +1,7 @@
 import boto3
 import logging
 from .ui import ui
+from ddtrace import tracer
 
 
 logger = logging.getLogger(__name__)
@@ -14,6 +15,7 @@ credential_cache = {}
 default_profile = None
 
 
+@tracer.wrap("get_session")
 def get_session(region, profile=None):
     """Creates a boto3 session with a cache
 

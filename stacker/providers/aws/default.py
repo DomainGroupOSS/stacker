@@ -4,6 +4,7 @@ import logging
 import time
 import urlparse
 import sys
+from ddtrace import tracer
 
 import botocore.exceptions
 from botocore.config import Config
@@ -42,6 +43,7 @@ MAX_TAIL_RETRIES = 5
 DEFAULT_CAPABILITIES = ["CAPABILITY_NAMED_IAM", ]
 
 
+@tracer.wrap("get_cloudformation_client")
 def get_cloudformation_client(session):
     config = Config(
         retries=dict(
@@ -447,6 +449,7 @@ class ProviderBuilder(object):
         self.region = region
         self.kwargs = kwargs
 
+    @tracer.wrap("aws.ProviderBuilder.build")
     def build(self, region=None, profile=None):
         if not region:
             region = self.region
