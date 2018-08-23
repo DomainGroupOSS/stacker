@@ -2,7 +2,7 @@ import os
 from setuptools import setup, find_packages
 
 
-VERSION = "1.4.0"
+VERSION = "1.4.0.1"
 
 src_dir = os.path.dirname(__file__)
 
@@ -13,8 +13,8 @@ install_requires = [
     "boto3>=1.3.1",
     "PyYAML>=3.12",
     "awacs>=0.6.0",
-    "gitpython~=2.0",
-    "schematics~=2.0.1",
+    "GitPython>=2",
+    "schematics>=2",
     "formic2",
     "python-dateutil~=2.0",
 ]
@@ -45,12 +45,12 @@ def read(filename):
 
 if __name__ == "__main__":
     setup(
-        name="stacker",
+        name="stacker-fork",
         version=VERSION,
-        author="Michael Barrett",
-        author_email="loki77@gmail.com",
+        author="Michael Barrett, Glenn Mason",
+        author_email="loki77@gmail.com, glenn.mason@domain.com.au",
         license="New BSD license",
-        url="https://github.com/cloudtools/stacker",
+        url="https://github.com/DomainGroupOSS/stacker",
         description="AWS CloudFormation Stack manager",
         long_description=read("README.rst"),
         packages=find_packages(),
